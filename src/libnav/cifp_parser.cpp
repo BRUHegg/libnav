@@ -382,7 +382,7 @@ namespace libnav
 
     // arinc_leg_t definitions:
 
-    arinc_leg_t arinc_str_t::get_leg(std::string& area_code, 
+    arinc_leg_t arinc_str_t::get_leg(std::string& area_code, airport_data_t& apt_data, 
         std::shared_ptr<ArptDB> arpt_db, std::shared_ptr<NavaidDB> navaid_db, 
         arinc_rwy_db_t& rwy_db)
     {
@@ -420,6 +420,8 @@ namespace libnav
         out.alt1_ft = str2alt(alt1);
         out.alt2_ft = str2alt(alt2);
         out.trans_alt = trans_alt;
+        if(trans_alt == 0)
+            out.trans_alt = int(apt_data.transition_alt_ft);
 
         out.speed_desc = char2spd_mode(speed_desc);
         out.spd_lim_kias = spd_lim;
@@ -632,6 +634,8 @@ namespace libnav
         icao_code = icao;
         err_code = DbErr::ERR_NONE;
 
+        arpt_db->get_airport_data(icao_code, &apt_data);
+
         self_alloc = false;
         if(leg_ptr == nullptr)
         {
@@ -662,6 +666,8 @@ namespace libnav
         
         err_code = copy.err_code;
         icao_code = copy.icao_code;
+
+        apt_data = copy.apt_data;
 
         use_appch_prefix = copy.use_appch_prefix;
         appch_prefix_db = copy.appch_prefix_db;
@@ -875,7 +881,7 @@ namespace libnav
                         trans_name = "NONE";
 
                     arinc_str_t arnc_str(s_split);
-                    arinc_leg_t leg = arnc_str.get_leg(icao_code, arpt_db, 
+                    arinc_leg_t leg = arnc_str.get_leg(icao_code, apt_data, arpt_db, 
                         navaid_db, rwy_db);
 
                     if(n_arinc_legs_used == N_FLT_LEG_CACHE_SZ)

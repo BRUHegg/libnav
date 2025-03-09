@@ -307,8 +307,9 @@ namespace libnav
 
         arinc_str_t(std::vector<std::string>& in_split);
 
-        arinc_leg_t get_leg(std::string& area_code, std::shared_ptr<ArptDB> arpt_db,
-            std::shared_ptr<NavaidDB> navaid_db, arinc_rwy_db_t& rwy_db);
+        arinc_leg_t get_leg(std::string& area_code, airport_data_t& apt_data, 
+            std::shared_ptr<ArptDB> arpt_db, std::shared_ptr<NavaidDB> navaid_db, 
+            arinc_rwy_db_t& rwy_db);
     };
 
 
@@ -391,6 +392,8 @@ namespace libnav
         ~Airport();
 
     private:
+        airport_data_t apt_data;
+
         bool use_appch_prefix;
         bool self_alloc;
         appr_pref_db_t appch_prefix_db;
