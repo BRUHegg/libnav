@@ -878,7 +878,7 @@ namespace libnav
                     std::string trans_name = strutils::strip(s_split[3], ' ');
 
                     if(trans_name == "")
-                        trans_name = "NONE";
+                        trans_name = NONE_TRANS;
 
                     arinc_str_t arnc_str(s_split);
                     arinc_leg_t leg = arnc_str.get_leg(icao_code, apt_data, arpt_db, 

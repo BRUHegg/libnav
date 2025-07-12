@@ -104,6 +104,9 @@ namespace libnav
     constexpr int N_ARINC_RWY_COL_SECOND = 3;
 
     constexpr int N_FLT_LEG_CACHE_SZ = 3000;
+
+    const std::string NONE_TRANS = "NONE";
+
     // Approach prefixes
     typedef std::unordered_map<char, std::string> appr_pref_db_t;
 
