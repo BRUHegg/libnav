@@ -230,9 +230,9 @@ namespace libnav
 
     // arinc_fix_entry_t definitions:
 
-    bool arinc_fix_entry_t::to_waypoint_t(std::string& area_code, 
-        std::shared_ptr<ArptDB> arpt_db, std::shared_ptr<NavaidDB> navaid_db, 
-        arinc_rwy_db_t& rwy_db, waypoint_t *out)
+    bool arinc_fix_entry_t::to_waypoint_t(const std::string& area_code, 
+        ArptDB* arpt_db, NavaidDB* navaid_db, 
+        const arinc_rwy_db_t& rwy_db, waypoint_t *out) const noexcept
     {
         NavaidType lookup_type = NavaidType::NONE;
         std::string lookup_area = "ENRT";
@@ -276,13 +276,6 @@ namespace libnav
         std::vector<waypoint_entry_t> wpts;
         navaid_db->get_wpt_data(fix_ident, &wpts, lookup_area, country_code, lookup_type);
 
-        //if(wpts.size() > 1)
-        //{
-        //    std::cout << fix_ident << " " << country_code << " " << 
-        //        area_code << " " << db_section << " " << db_subsection << "\n";
-        //}
-        //assert(wpts.size() < 2);
-
         if(wpts.size())
         {
             *out = {fix_ident, wpts[0]};
@@ -294,7 +287,7 @@ namespace libnav
 
     // arinc_leg_t definitions:
 
-    double arinc_leg_t::get_mag_var_deg()
+    double arinc_leg_t::get_mag_var_deg() const noexcept
     {
         if(has_recd_navaid)
         {
@@ -332,7 +325,7 @@ namespace libnav
 
     // arinc_str_t definitions:
 
-    arinc_str_t::arinc_str_t(std::vector<std::string>& in_split)
+    arinc_str_t::arinc_str_t(const std::vector<std::string>& in_split)
     {
         rt_type = in_split[1][0];
         
@@ -382,9 +375,10 @@ namespace libnav
 
     // arinc_leg_t definitions:
 
-    arinc_leg_t arinc_str_t::get_leg(std::string& area_code, airport_data_t& apt_data, 
-        std::shared_ptr<ArptDB> arpt_db, std::shared_ptr<NavaidDB> navaid_db, 
-        arinc_rwy_db_t& rwy_db)
+    arinc_leg_t arinc_str_t::get_leg(const std::string& area_code, 
+        const airport_data_t& apt_data, 
+        ArptDB* arpt_db, NavaidDB* navaid_db, 
+        const arinc_rwy_db_t& rwy_db)
     {
         arinc_leg_t out;
         out.rt_type = rt_type;
@@ -441,8 +435,8 @@ namespace libnav
 
     // arinc_rwy_full_t definitions:
 
-    int arinc_rwy_full_t::get_pos_from_db(std::string& area_code, 
-        std::shared_ptr<ArptDB> arpt_db)
+    int arinc_rwy_full_t::get_pos_from_db(const std::string& area_code, 
+        ArptDB* arpt_db)
     {
         runway_entry_t rnw;
         int ret = arpt_db->get_rnw_data(area_code, id, &rnw);
@@ -456,8 +450,8 @@ namespace libnav
         return ret;
     }
 
-    void arinc_rwy_full_t::get_rwy_coords(std::string& s, std::string& area_code, 
-        std::shared_ptr<ArptDB> arpt_db)
+    void arinc_rwy_full_t::get_rwy_coords(const std::string& s, 
+        const std::string& area_code, ArptDB* arpt_db)
     {
         std::vector<std::string> second_part_splt = strutils::str_split(
             s, ARINC_FIELD_SEP);
@@ -488,8 +482,8 @@ namespace libnav
         }
     }
 
-    arinc_rwy_full_t::arinc_rwy_full_t(std::string& s, std::string& area_code, 
-        std::shared_ptr<ArptDB> arpt_db)
+    arinc_rwy_full_t::arinc_rwy_full_t(const std::string& s, 
+        const std::string& area_code, ArptDB* arpt_db)
     {
         /*
             Runway data is grouped into 2 parts separated by ';'. 
@@ -544,8 +538,9 @@ namespace libnav
     }
 
 
-    bool get_rnw_wpt(arinc_rwy_db_t& rwy_db, std::string& id, std::string& area_cd, 
-        std::string& country_cd, waypoint_t *out)
+    bool get_rnw_wpt(const arinc_rwy_db_t& rwy_db, const std::string& id, 
+        const std::string& area_cd, const std::string& country_cd, 
+        waypoint_t *out)
     {
         std::string tmp = id;
         size_t tmp_length = tmp.length();
@@ -556,9 +551,10 @@ namespace libnav
 
         tmp = strutils::normalize_rnw_id(tmp);
         
-        if(rwy_db.find(tmp) != rwy_db.end())
+        auto tmp_it = rwy_db.find(tmp);
+        if(tmp_it != rwy_db.end())
         {
-            out->data.pos = rwy_db[tmp].pos;
+            out->data.pos = tmp_it->second.pos;
             out->id = tmp;
             out->data.type = NavaidType::RWY;
             out->data.area_code = area_cd;
@@ -624,8 +620,8 @@ namespace libnav
 
     // public member functions:
 
-    Airport::Airport(std::string icao, std::shared_ptr<ArptDB> arpt_db, 
-        std::shared_ptr<NavaidDB> navaid_db, std::string cifp_path,
+    Airport::Airport(std::string icao, ArptDB* arpt_db, 
+        NavaidDB* navaid_db, std::string cifp_path,
         std::string postfix, bool use_pr, appr_pref_db_t pr_db, arinc_leg_t* leg_ptr)
     {
         use_appch_prefix = use_pr;
@@ -698,7 +694,15 @@ namespace libnav
         star_per_rwy = copy.star_per_rwy;
     }
 
-    std::vector<std::string> Airport::get_rwys()
+    std::string Airport::get_icao() const noexcept {
+        return icao_code;
+    }
+
+    DbErr Airport::get_err() const noexcept {
+        return err_code;
+    }
+
+    std::vector<std::string> Airport::get_rwys() const noexcept
     {
         std::vector<std::string> out;
         for(auto i: rwy_db)
@@ -708,72 +712,75 @@ namespace libnav
         return out;
     }
 
-    const arinc_rwy_db_t& Airport::get_rwy_db()
+    const arinc_rwy_db_t& Airport::get_rwy_db() const noexcept
     {
         return rwy_db;
     }
 
-    str_umap_t Airport::get_all_sids()
+    str_umap_t Airport::get_all_sids() const noexcept
     {
         return get_all_proc(sid_db);
     }
 
-    str_umap_t Airport::get_all_stars()
+    str_umap_t Airport::get_all_stars() const noexcept
     {
         return get_all_proc(star_db);
     }
 
-    str_umap_t Airport::get_all_appch()
+    str_umap_t Airport::get_all_appch() const noexcept
     {
         return get_all_proc(appch_db);
     }
 
-    arinc_leg_seq_t Airport::get_sid(std::string& proc_name, std::string& trans)
+    arinc_leg_seq_t Airport::get_sid(const std::string& proc_name, 
+        const std::string& trans) const noexcept
     {
         return get_proc(proc_name, trans, sid_db);
     }
 
-    arinc_leg_seq_t Airport::get_star(std::string& proc_name, std::string& trans)
+    arinc_leg_seq_t Airport::get_star(const std::string& proc_name, 
+        const std::string& trans) const noexcept
     {
         return get_proc(proc_name, trans, star_db);
     }
 
-    arinc_leg_seq_t Airport::get_appch(std::string& proc_name, std::string& trans)
+    arinc_leg_seq_t Airport::get_appch(const std::string& proc_name, 
+        const std::string& trans) const noexcept
     {
         return get_proc(proc_name, trans, appch_db);
     }
 
-    str_set_t Airport::get_sid_by_rwy(std::string& rwy_id)
+    str_set_t Airport::get_sid_by_rwy(const std::string& rwy_id) const noexcept
     {
         return get_proc_by_rwy(rwy_id, sid_per_rwy);
     }
 
-    str_set_t Airport::get_star_by_rwy(std::string& rwy_id)
+    str_set_t Airport::get_star_by_rwy(const std::string& rwy_id) const noexcept
     {
         return get_proc_by_rwy(rwy_id, star_per_rwy);
     }
 
-    str_set_t Airport::get_rwy_by_sid(std::string& sid)
+    str_set_t Airport::get_rwy_by_sid(const std::string& sid) const noexcept
     {
         return get_trans_by_proc(sid, sid_db, true);
     }
 
-    str_set_t Airport::get_rwy_by_star(std::string& star)
+    str_set_t Airport::get_rwy_by_star(const std::string& star) const noexcept
     {
         return get_trans_by_proc(star, star_db, true);
     }
 
-    str_set_t Airport::get_trans_by_sid(std::string& sid)
+    str_set_t Airport::get_trans_by_sid(const std::string& sid) const noexcept
     {
         return get_trans_by_proc(sid, sid_db);
     }
 
-    str_set_t Airport::get_trans_by_star(std::string& star)
+    str_set_t Airport::get_trans_by_star(const std::string& star) const noexcept
     {
         return get_trans_by_proc(star, star_db);
     }
 
-    str_set_t Airport::get_trans_by_appch(std::string& appch)
+    str_set_t Airport::get_trans_by_appch(const std::string& appch) const noexcept
     {
         return get_trans_by_proc(appch, appch_db);
     }
@@ -788,7 +795,7 @@ namespace libnav
 
     // private member functions:
 
-    str_umap_t Airport::get_all_proc(proc_db_t& db)
+    str_umap_t Airport::get_all_proc(const proc_db_t& db) const noexcept
     {
         str_umap_t out;
         for(auto i: db)
@@ -802,18 +809,20 @@ namespace libnav
         return out;
     }
 
-    arinc_leg_seq_t Airport::get_proc(std::string& proc_name, std::string& trans, 
-        proc_db_t& db)
+    arinc_leg_seq_t Airport::get_proc(const std::string& proc_name, 
+        const std::string& trans, const proc_db_t& db) const noexcept
     {
-        if(db.find(proc_name) != db.end())
+        auto proc_it = db.find(proc_name);
+        if(proc_it != db.end())
         {
-            if(db[proc_name].find(trans) != db[proc_name].end())
+            auto trans_it = proc_it->second.find(trans);
+            if(trans_it != proc_it->second.end())
             {
                 arinc_leg_seq_t proc_legs;
 
-                for(size_t i = 0; i < db[proc_name][trans].size(); i++)
+                for(size_t i = 0; i < trans_it->second.size(); i++)
                 {
-                    int leg_idx = db[proc_name][trans][i];
+                    int leg_idx = trans_it->second[i];
                     proc_legs.push_back(arinc_legs[leg_idx]);
                 }
 
@@ -823,26 +832,28 @@ namespace libnav
         return {};
     }
 
-    str_set_t Airport::get_proc_by_rwy(std::string& rwy_id, 
-        str_umap_t& umap)
+    str_set_t Airport::get_proc_by_rwy(const std::string& rwy_id, 
+        const str_umap_t& umap) const noexcept
     {
-        if(umap.find(rwy_id) != umap.end())
+        auto iter = umap.find(rwy_id);
+        if(iter != umap.end())
         {
             // Case: runway was found
-            return umap[rwy_id];
+            return iter->second;
         }
 
         return {};
     }
 
-    str_set_t Airport::get_trans_by_proc(std::string& proc_name, 
-        proc_db_t db, bool rwy)
+    str_set_t Airport::get_trans_by_proc(const std::string& proc_name, 
+        const proc_db_t& db, bool rwy) const noexcept
     {
         str_set_t out;
 
-        if(db.find(proc_name) != db.end())
+        auto proc_name_iter = db.find(proc_name);
+        if(proc_name_iter != db.end())
         {
-            for(auto i: db[proc_name])
+            for(auto i: proc_name_iter->second)
             {
                 if(rwy_db.find(i.first) != rwy_db.end() && rwy)
                 {
@@ -858,8 +869,7 @@ namespace libnav
         return out;
     }
 
-    DbErr Airport::parse_flt_legs(std::shared_ptr<ArptDB> arpt_db, 
-        std::shared_ptr<NavaidDB> navaid_db)
+    DbErr Airport::parse_flt_legs(ArptDB* arpt_db, NavaidDB* navaid_db)
     {
         DbErr out = DbErr::SUCCESS;
         while(flt_leg_strings.size())
@@ -948,9 +958,9 @@ namespace libnav
         return out;
     }
 
-    DbErr Airport::load_db(std::shared_ptr<ArptDB> arpt_db, 
-        std::shared_ptr<NavaidDB> navaid_db, std::string& path,
-        std::string& postfix)
+    DbErr Airport::load_db(ArptDB* arpt_db, 
+        NavaidDB* navaid_db, const std::string& path,
+        const std::string& postfix)
     {
         std::string full_path = path + "/" + icao_code + postfix;
 

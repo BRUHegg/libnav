@@ -451,7 +451,8 @@ namespace libnav
 		return false;
 	}
 
-	size_t NavaidDB::get_wpt_data(std::string& id, std::vector<waypoint_entry_t>* out, 
+	size_t NavaidDB::get_wpt_data(const std::string& id, 
+		std::vector<waypoint_entry_t>* out, 
 		std::string area_code, std::string country_code, NavaidType type, 
 		navaid_filter_t filt_func, void* ref)
 	{

@@ -115,8 +115,6 @@ namespace libnav
 			str_rnw_t;
 
 	public:
-		DbErr err_code;
-
 		ArptDB(std::string sim_arpt_path, std::string custom_arpt_path,
 			std::string custom_rnw_path, double min_rwy_l_m = MIN_RWY_LENGTH_M);
 
@@ -150,6 +148,8 @@ namespace libnav
 		int get_rnw_data(std::string apt_icao, std::string rnw_id, runway_entry_t* out);
 
 	private:
+		DbErr err_code;
+
 		int db_version;  // May be used later
 		double min_rwy_length_m;
 

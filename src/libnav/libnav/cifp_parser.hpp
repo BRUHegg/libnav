@@ -179,14 +179,13 @@ namespace libnav
         arinc_rwy_data_t data;
 
 
-        int get_pos_from_db(std::string& area_code, 
-        std::shared_ptr<ArptDB> arpt_db);
+        int get_pos_from_db(const std::string& area_code, ArptDB* arpt_db);
 
-        void get_rwy_coords(std::string& s, std::string& area_code, 
-            std::shared_ptr<ArptDB> arpt_db);
+        void get_rwy_coords(const std::string& s, const std::string& area_code, 
+            ArptDB* arpt_db);
 
-        arinc_rwy_full_t(std::string& s, std::string& area_code, 
-            std::shared_ptr<ArptDB> arpt_db);
+        arinc_rwy_full_t(const std::string& s, const std::string& area_code, 
+            ArptDB* arpt_db);
     };
 
     typedef std::unordered_map<std::string, arinc_rwy_data_t> arinc_rwy_db_t;
@@ -200,9 +199,9 @@ namespace libnav
         char db_subsection;  //Ref: arinc424 spec, section 5.5
 
 
-        bool to_waypoint_t(std::string& area_code, 
-            std::shared_ptr<ArptDB> arpt_db, std::shared_ptr<NavaidDB> navaid_db, 
-            arinc_rwy_db_t& rwy_db, waypoint_t *out);
+        bool to_waypoint_t(const std::string& area_code, 
+            ArptDB* arpt_db, NavaidDB* navaid_db, 
+            const arinc_rwy_db_t& rwy_db, waypoint_t *out) const noexcept;
     };
 
     struct arinc_leg_t
@@ -252,7 +251,7 @@ namespace libnav
 
 
         // Gets mag var from the recommended navaid
-        double get_mag_var_deg();
+        double get_mag_var_deg() const noexcept;
 
         // Use the following functions if you ever need to set any leg's fix manually.
         // NEVER set the leg fixes manually.
@@ -308,11 +307,12 @@ namespace libnav
         char rt_qual2;  // Column 38. Ref: arinc424 spec, section 5.7
 
 
-        arinc_str_t(std::vector<std::string>& in_split);
+        arinc_str_t(const std::vector<std::string>& in_split);
 
-        arinc_leg_t get_leg(std::string& area_code, airport_data_t& apt_data, 
-            std::shared_ptr<ArptDB> arpt_db, std::shared_ptr<NavaidDB> navaid_db, 
-            arinc_rwy_db_t& rwy_db);
+        arinc_leg_t get_leg(const std::string& area_code, 
+            const airport_data_t& apt_data, 
+            ArptDB* arpt_db, NavaidDB* navaid_db, 
+            const arinc_rwy_db_t& rwy_db);
     };
 
 
@@ -330,8 +330,9 @@ namespace libnav
         the start of the selected runway.
         @return true if waypoint was written, otherwise false.
     */
-    bool get_rnw_wpt(arinc_rwy_db_t& rwy_db, std::string& id, std::string& area_cd, 
-        std::string& country_cd, waypoint_t *out);
+    bool get_rnw_wpt(const arinc_rwy_db_t& rwy_db, const std::string& id, 
+        const std::string& area_cd, const std::string& country_cd, 
+        waypoint_t *out);
 
     std::vector<std::string> get_all_rwys_by_mask(std::string mask, 
         arinc_rwy_db_t& rwy_db);
@@ -350,51 +351,55 @@ namespace libnav
         
 
     public:
-        DbErr err_code;
-
-        std::string icao_code;
-
-
-        Airport(std::string icao, std::shared_ptr<ArptDB> arpt_db, 
-            std::shared_ptr<NavaidDB> navaid_db, std::string cifp_path="", 
+        Airport(std::string icao, ArptDB* arpt_db, 
+            NavaidDB* navaid_db, std::string cifp_path="", 
             std::string postfix=".dat", bool use_pr=false, appr_pref_db_t pr_db = APPR_PREF, 
             arinc_leg_t* leg_ptr=nullptr);
 
         Airport(Airport& copy, arinc_leg_t* leg_ptr=nullptr);
 
-        std::vector<std::string> get_rwys();
+        std::string get_icao() const noexcept;
 
-        const arinc_rwy_db_t& get_rwy_db();
+        DbErr get_err() const noexcept;
 
-        str_umap_t get_all_sids();
+        std::vector<std::string> get_rwys() const noexcept;
 
-        str_umap_t get_all_stars();
+        const arinc_rwy_db_t& get_rwy_db() const noexcept;
 
-        str_umap_t get_all_appch();
+        str_umap_t get_all_sids() const noexcept;
 
-        arinc_leg_seq_t get_sid(std::string& proc_name, std::string& trans);
+        str_umap_t get_all_stars() const noexcept;
 
-        arinc_leg_seq_t get_star(std::string& proc_name, std::string& trans);
+        str_umap_t get_all_appch() const noexcept;
 
-        arinc_leg_seq_t get_appch(std::string& proc_name, std::string& trans);
+        arinc_leg_seq_t get_sid(const std::string& proc_name, 
+            const std::string& trans) const noexcept;
 
-        str_set_t get_sid_by_rwy(std::string& rwy_id);
+        arinc_leg_seq_t get_star(const std::string& proc_name, 
+            const std::string& trans) const noexcept;
 
-        str_set_t get_star_by_rwy(std::string& rwy_id);
+        arinc_leg_seq_t get_appch(const std::string& proc_name, 
+            const std::string& trans) const noexcept;
 
-        str_set_t get_rwy_by_sid(std::string& sid);
+        str_set_t get_sid_by_rwy(const std::string& rwy_id) const noexcept;
 
-        str_set_t get_rwy_by_star(std::string& star);
+        str_set_t get_star_by_rwy(const std::string& rwy_id) const noexcept;
 
-        str_set_t get_trans_by_sid(std::string& sid);
+        str_set_t get_rwy_by_sid(const std::string& sid) const noexcept;
 
-        str_set_t get_trans_by_star(std::string& star);
+        str_set_t get_rwy_by_star(const std::string& star) const noexcept;
 
-        str_set_t get_trans_by_appch(std::string& appch);
+        str_set_t get_trans_by_sid(const std::string& sid) const noexcept;
+
+        str_set_t get_trans_by_star(const std::string& star) const noexcept;
+
+        str_set_t get_trans_by_appch(const std::string& appch) const noexcept;
 
         ~Airport();
 
     private:
+        DbErr err_code;
+        std::string icao_code;
         airport_data_t apt_data;
 
         bool use_appch_prefix;
@@ -403,10 +408,6 @@ namespace libnav
         arinc_rwy_db_t rwy_db;
         arinc_leg_t* arinc_legs;
         int n_arinc_legs_used;
-
-        //std::mutex sid_mutex;
-        //std::mutex star_mutex;
-        //std::mutex appch_mutex;
 
         /*
             Storage of procedures:
@@ -424,16 +425,16 @@ namespace libnav
         std::queue<proc_typed_str_t> flt_leg_strings;
 
 
-        str_umap_t get_all_proc(proc_db_t& db);
+        str_umap_t get_all_proc(const proc_db_t& db) const noexcept;
 
-        arinc_leg_seq_t get_proc(std::string& proc_name, std::string& trans, 
-            proc_db_t& db);
+        arinc_leg_seq_t get_proc(const std::string& proc_name, 
+            const std::string& trans, const proc_db_t& db) const noexcept;
 
-        str_set_t get_proc_by_rwy(std::string& rwy_id, 
-            str_umap_t& umap);
+        str_set_t get_proc_by_rwy(const std::string& rwy_id, 
+            const str_umap_t& umap) const noexcept;
 
-        str_set_t get_trans_by_proc(std::string& proc_name, 
-            proc_db_t db, bool rwy=false);
+        str_set_t get_trans_by_proc(const std::string& proc_name, 
+            const proc_db_t& db, bool rwy=false) const noexcept;
 			
 		/*
             Function: parse_flt_legs
@@ -448,8 +449,7 @@ namespace libnav
                 DbErr::BAD_ALLOC
         */
 
-        DbErr parse_flt_legs(std::shared_ptr<ArptDB> arpt_db, 
-            std::shared_ptr<NavaidDB> navaid_db);
+        DbErr parse_flt_legs(ArptDB* arpt_db, NavaidDB* navaid_db);
 
 		/*
             Function: load_db
@@ -467,8 +467,7 @@ namespace libnav
                 DbErr::BAD_ALLOC
         */
 
-        DbErr load_db(std::shared_ptr<ArptDB> arpt_db, 
-            std::shared_ptr<NavaidDB> navaid_db, std::string& path, 
-            std::string& postfix);
+        DbErr load_db(ArptDB* arpt_db, NavaidDB* navaid_db, 
+            const std::string& path, const std::string& postfix);
     };
 }; // namespace libnav

@@ -419,7 +419,8 @@ namespace dbg
             return;
         }
         
-        libnav::Airport apt(in[0], av->arpt_db_ptr, av->navaid_db_ptr, av->cifp_dir_path);
+        libnav::Airport apt(in[0], av->arpt_db_ptr.get(), 
+            av->navaid_db_ptr.get(), av->cifp_dir_path);
 
         std::vector<std::string> rwys = apt.get_rwys();
         for(auto i: rwys)
@@ -436,7 +437,8 @@ namespace dbg
             return;
         }
         
-        libnav::Airport apt(in[0], av->arpt_db_ptr, av->navaid_db_ptr, av->cifp_dir_path);
+        libnav::Airport apt(in[0], av->arpt_db_ptr.get(), av->navaid_db_ptr.get(), 
+            av->cifp_dir_path);
         libnav::Airport apt1(apt);
 
         auto sids = apt1.get_all_sids();
@@ -459,7 +461,8 @@ namespace dbg
             return;
         }
         
-        libnav::Airport apt(in[0], av->arpt_db_ptr, av->navaid_db_ptr, av->cifp_dir_path);
+        libnav::Airport apt(in[0], av->arpt_db_ptr.get(), av->navaid_db_ptr.get(), 
+            av->cifp_dir_path);
 
         auto appr = apt.get_all_appch();
 
@@ -481,7 +484,8 @@ namespace dbg
             return;
         }
         
-        libnav::Airport apt(in[0], av->arpt_db_ptr, av->navaid_db_ptr, av->cifp_dir_path);
+        libnav::Airport apt(in[0], av->arpt_db_ptr.get(), av->navaid_db_ptr.get(), 
+            av->cifp_dir_path);
         libnav::Airport apt1(apt);
 
         libnav::arinc_leg_seq_t sid_legs = apt1.get_sid(in[1], in[2]);
@@ -499,10 +503,11 @@ namespace dbg
             return;
         }
         
-        libnav::Airport apt(in[0], av->arpt_db_ptr, av->navaid_db_ptr, av->cifp_dir_path);
+        libnav::Airport apt(in[0], av->arpt_db_ptr.get(), av->navaid_db_ptr.get(), 
+            av->cifp_dir_path);
 
-        if(apt.err_code != libnav::DbErr::SUCCESS &&
-            apt.err_code != libnav::DbErr::PARTIAL_LOAD)
+        if(apt.get_err() != libnav::DbErr::SUCCESS &&
+            apt.get_err() != libnav::DbErr::PARTIAL_LOAD)
         {
             std::cout << "Invalid airport icao\n";
             return;
@@ -523,10 +528,11 @@ namespace dbg
             return;
         }
         
-        libnav::Airport apt(in[0], av->arpt_db_ptr, av->navaid_db_ptr, av->cifp_dir_path);
+        libnav::Airport apt(in[0], av->arpt_db_ptr.get(), av->navaid_db_ptr.get(), 
+            av->cifp_dir_path);
 
-        if(apt.err_code != libnav::DbErr::SUCCESS &&
-            apt.err_code != libnav::DbErr::PARTIAL_LOAD)
+        if(apt.get_err() != libnav::DbErr::SUCCESS &&
+            apt.get_err() != libnav::DbErr::PARTIAL_LOAD)
         {
             std::cout << "Invalid airport icao\n";
             return;
@@ -547,10 +553,11 @@ namespace dbg
             return;
         }
 
-        libnav::Airport apt(in[0], av->arpt_db_ptr, av->navaid_db_ptr, av->cifp_dir_path);
+        libnav::Airport apt(in[0], av->arpt_db_ptr.get(), av->navaid_db_ptr.get(), 
+            av->cifp_dir_path);
 
-        if(apt.err_code != libnav::DbErr::SUCCESS &&
-            apt.err_code != libnav::DbErr::PARTIAL_LOAD)
+        if(apt.get_err() != libnav::DbErr::SUCCESS &&
+            apt.get_err() != libnav::DbErr::PARTIAL_LOAD)
         {
             std::cout << "Invalid airport icao\n";
             return;
@@ -579,10 +586,11 @@ namespace dbg
             return;
         }
 
-        libnav::Airport apt(in[0], av->arpt_db_ptr, av->navaid_db_ptr, av->cifp_dir_path);
+        libnav::Airport apt(in[0], av->arpt_db_ptr.get(), av->navaid_db_ptr.get(), 
+            av->cifp_dir_path);
 
-        if(apt.err_code != libnav::DbErr::SUCCESS &&
-            apt.err_code != libnav::DbErr::PARTIAL_LOAD)
+        if(apt.get_err() != libnav::DbErr::SUCCESS &&
+            apt.get_err() != libnav::DbErr::PARTIAL_LOAD)
         {
             std::cout << "Invalid airport icao\n";
             return;
@@ -611,10 +619,11 @@ namespace dbg
             return;
         }
 
-        libnav::Airport apt(in[0], av->arpt_db_ptr, av->navaid_db_ptr, av->cifp_dir_path);
+        libnav::Airport apt(in[0], av->arpt_db_ptr.get(), av->navaid_db_ptr.get(), 
+            av->cifp_dir_path);
 
-        if(apt.err_code != libnav::DbErr::SUCCESS &&
-            apt.err_code != libnav::DbErr::PARTIAL_LOAD)
+        if(apt.get_err() != libnav::DbErr::SUCCESS &&
+            apt.get_err() != libnav::DbErr::PARTIAL_LOAD)
         {
             std::cout << "Invalid airport icao\n";
             return;
@@ -636,10 +645,11 @@ namespace dbg
             return;
         }
 
-        libnav::Airport apt(in[0], av->arpt_db_ptr, av->navaid_db_ptr, av->cifp_dir_path);
+        libnav::Airport apt(in[0], av->arpt_db_ptr.get(), av->navaid_db_ptr.get(), 
+            av->cifp_dir_path);
 
-        if(apt.err_code != libnav::DbErr::SUCCESS &&
-            apt.err_code != libnav::DbErr::PARTIAL_LOAD)
+        if(apt.get_err() != libnav::DbErr::SUCCESS &&
+            apt.get_err() != libnav::DbErr::PARTIAL_LOAD)
         {
             std::cout << "Invalid airport icao\n";
             return;

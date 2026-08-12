@@ -175,10 +175,6 @@ namespace libnav
 	class NavaidDB
 	{
 	public:
-
-		DbErr err_code;
-
-
 		NavaidDB(std::string wpt_path, std::string navaid_path);
 
 		DbErr get_wpt_err();
@@ -205,7 +201,7 @@ namespace libnav
 
 		// get_wpt_data returns 0 if waypoint is not in the database. 
 		// Otherwise, returns number of items written to out.
-		size_t get_wpt_data(std::string& id, std::vector<waypoint_entry_t>* out, 
+		size_t get_wpt_data(const std::string& id, std::vector<waypoint_entry_t>* out, 
 			std::string area_code="", std::string country_code="", 
 			NavaidType type=NavaidType::NAVAID, 
 			navaid_filter_t filt_func=default_navaid_filter, void* ref=NULL);
@@ -239,6 +235,8 @@ namespace libnav
 		~NavaidDB();
 
 	private:
+		DbErr err_code;
+
 		int wpt_airac_cycle, wpt_db_version;
 		int navaid_airac_cycle, navaid_db_version;
 
