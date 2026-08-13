@@ -655,7 +655,7 @@ namespace libnav
         }
     }
 
-    Airport::Airport(Airport& copy, arinc_leg_t* leg_ptr): appch_prefix_db(), rwy_db(), 
+    Airport::Airport(const Airport& copy, arinc_leg_t* leg_ptr): appch_prefix_db(), rwy_db(), 
         sid_db(), star_db(), appch_db(), sid_per_rwy(), star_per_rwy()
     {
         assert(flt_leg_strings.size() == 0); // Make sure the other airport isn't being updated

@@ -356,7 +356,7 @@ namespace libnav
             std::string postfix=".dat", bool use_pr=false, appr_pref_db_t pr_db = APPR_PREF, 
             arinc_leg_t* leg_ptr=nullptr);
 
-        Airport(Airport& copy, arinc_leg_t* leg_ptr=nullptr);
+        Airport(const Airport& copy, arinc_leg_t* leg_ptr=nullptr);
 
         std::string get_icao() const noexcept;
 

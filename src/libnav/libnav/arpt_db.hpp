@@ -139,9 +139,9 @@ namespace libnav
 
 		// Normal user interface functions:
 
-		bool is_airport(std::string icao_code);
+		bool is_airport(std::string icao_code) const;
 
-		bool get_airport_data(std::string icao_code, airport_data_t* out);
+		bool get_airport_data(std::string icao_code, airport_data_t* out) const;
 
 		int get_apt_rwys(std::string icao_code, runway_data* out);
 
@@ -165,11 +165,11 @@ namespace libnav
 		std::vector<airport_t> arpt_queue;
 		std::vector<rnw_data_t> rnw_queue;
 
-		std::mutex arpt_queue_mutex;
-		std::mutex rnw_queue_mutex;
+		mutable std::mutex arpt_queue_mutex;
+		mutable std::mutex rnw_queue_mutex;
 
-		std::mutex arpt_db_mutex;
-		std::mutex rnw_db_mutex;
+		mutable std::mutex arpt_db_mutex;
+		mutable std::mutex rnw_db_mutex;
 
 		std::string sim_arpt_db_path;
 		std::string custom_arpt_db_path;

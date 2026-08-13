@@ -433,7 +433,7 @@ namespace libnav
 		true if if there's an airport in the data base with such ICAO code. Otherwise, returns false.
 	*/
 
-	bool ArptDB::is_airport(std::string icao_code)
+	bool ArptDB::is_airport(std::string icao_code) const
 	{
 		std::lock_guard<std::mutex> lock(arpt_db_mutex);
 		return arpt_db.find(icao_code) != arpt_db.end();
@@ -450,7 +450,7 @@ namespace libnav
 		Returns 1 if any data has been written to out. Otherwise, returns 0.
 	*/
 
-	bool ArptDB::get_airport_data(std::string icao_code, airport_data_t* out)
+	bool ArptDB::get_airport_data(std::string icao_code, airport_data_t* out) const
 	{
 		if (is_airport(icao_code))
 		{

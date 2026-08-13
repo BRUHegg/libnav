@@ -308,22 +308,22 @@ namespace libnav
 		return navaid_task.get();
 	}
 
-	int NavaidDB::get_wpt_cycle()
+	int NavaidDB::get_wpt_cycle() const noexcept
 	{
 		return wpt_airac_cycle;
 	}
 	
-	int NavaidDB::get_wpt_version()
+	int NavaidDB::get_wpt_version() const noexcept
 	{
 		return wpt_db_version;
 	}
 
-	int NavaidDB::get_navaid_cycle()
+	int NavaidDB::get_navaid_cycle() const noexcept
 	{
 		return navaid_airac_cycle;
 	}
 
-	int NavaidDB::get_navaid_version()
+	int NavaidDB::get_navaid_version() const noexcept
 	{
 		return navaid_db_version;
 	}

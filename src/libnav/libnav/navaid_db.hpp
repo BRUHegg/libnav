@@ -181,13 +181,13 @@ namespace libnav
 		 
 		DbErr get_navaid_err();
 
-		int get_wpt_cycle();
+		int get_wpt_cycle() const noexcept;
 
-		int get_wpt_version();
+		int get_wpt_version() const noexcept;
 
-		int get_navaid_cycle();
+		int get_navaid_cycle() const noexcept;
 
-		int get_navaid_version();
+		int get_navaid_version() const noexcept;
 
 		DbErr load_waypoints();
 
