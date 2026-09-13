@@ -108,4 +108,6 @@ float stof_with_strip(const std::string& s, char s_char = ' ') noexcept;
 std::string normalize_rnw_id(const std::string& id) noexcept;
 
 std::string get_rnw_id(const std::string& id, bool ignore_all = false) noexcept;
+
+bool is_valid_airport_icao(const std::string& icao) noexcept;
 };  // namespace strutils

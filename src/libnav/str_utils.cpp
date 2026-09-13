@@ -16,14 +16,19 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <ctype.h>
-#include <math.h>
+#include <cctype>
+#include <cmath>
 
 #include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
+
+namespace {
+  
+constexpr std::size_t AIRPORT_ICAO_LN = 4;
+} // namespace
 
 namespace strutils {
 
@@ -311,7 +316,7 @@ std::string get_rnw_id(const std::string& id, bool ignore_all) noexcept {
   }
   if (id.length() > 2 && id.length() < 6 && id[0] == 'R' && id[1] == 'W') {
     size_t i = 2;
-    while (i < id.length() && !isalpha(id[i])) {
+    while (i < id.length() && !std::isalpha(id[i])) {
       i++;
     }
 
@@ -321,5 +326,17 @@ std::string get_rnw_id(const std::string& id, bool ignore_all) noexcept {
     }
   }
   return "";
+}
+
+bool is_valid_airport_icao(const std::string& icao) noexcept {
+  if(icao.length() != AIRPORT_ICAO_LN) {
+    return false;
+  }
+  for(std::size_t i = 0; i < AIRPORT_ICAO_LN; ++i) {
+    if(!std::isalpha(icao[i])) {
+      return false;
+    }
+  }
+  return true;
 }
 };  // namespace strutils

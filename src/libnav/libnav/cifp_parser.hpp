@@ -360,6 +360,8 @@ namespace libnav
 
         std::string get_icao() const noexcept;
 
+        airport_data_t get_location_data() const noexcept;
+
         DbErr get_err() const noexcept;
 
         std::vector<std::string> get_rwys() const noexcept;
@@ -398,16 +400,16 @@ namespace libnav
         ~Airport();
 
     private:
-        DbErr err_code;
-        std::string icao_code;
-        airport_data_t apt_data;
+        DbErr err_code_;
+        std::string icao_code_;
+        airport_data_t apt_data_;
 
-        bool use_appch_prefix;
-        bool self_alloc;
-        appr_pref_db_t appch_prefix_db;
-        arinc_rwy_db_t rwy_db;
-        arinc_leg_t* arinc_legs;
-        int n_arinc_legs_used;
+        bool use_appch_prefix_;
+        bool self_alloc_;
+        appr_pref_db_t appch_prefix_db_;
+        arinc_rwy_db_t rwy_db_;
+        arinc_leg_t* arinc_legs_;
+        int n_arinc_legs_used_;
 
         /*
             Storage of procedures:
@@ -415,14 +417,14 @@ namespace libnav
             [proc_name][trans][legs]
         */
 
-        proc_db_t sid_db;
-        proc_db_t star_db;
-        proc_db_t appch_db;
+        proc_db_t sid_db_;
+        proc_db_t star_db_;
+        proc_db_t appch_db_;
 
-        str_umap_t sid_per_rwy;
-        str_umap_t star_per_rwy;
+        str_umap_t sid_per_rwy_;
+        str_umap_t star_per_rwy_;
 
-        std::queue<proc_typed_str_t> flt_leg_strings;
+        std::queue<proc_typed_str_t> flt_leg_strings_;
 
 
         str_umap_t get_all_proc(const proc_db_t& db) const noexcept;
@@ -439,7 +441,7 @@ namespace libnav
 		/*
             Function: parse_flt_legs
             Description:
-            Parses flight legs. It takes them from flt_leg_strings. The function populates
+            Parses flight legs. It takes them from flt_leg_strings_. The function populates
             SID/STAR/Approach and runway data bases.
             @param arpt_db: pointer to airport data base
             @param navaid_db: pointer to navaid data base

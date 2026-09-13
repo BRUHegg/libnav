@@ -624,88 +624,92 @@ namespace libnav
         NavaidDB* navaid_db, std::string cifp_path,
         std::string postfix, bool use_pr, appr_pref_db_t pr_db, arinc_leg_t* leg_ptr)
     {
-        use_appch_prefix = use_pr;
-        appch_prefix_db = pr_db;
+        use_appch_prefix_ = use_pr;
+        appch_prefix_db_ = pr_db;
 
-        icao_code = icao;
-        err_code = DbErr::ERR_NONE;
+        icao_code_ = icao;
+        err_code_ = DbErr::ERR_NONE;
 
-        arpt_db->get_airport_data(icao_code, &apt_data);
+        arpt_db->get_airport_data(icao_code_, &apt_data_);
 
-        self_alloc = false;
+        self_alloc_ = false;
         if(leg_ptr == nullptr)
         {
-            arinc_legs = new arinc_leg_t[N_FLT_LEG_CACHE_SZ];
-            self_alloc = true;
+            arinc_legs_ = new arinc_leg_t[N_FLT_LEG_CACHE_SZ];
+            self_alloc_ = true;
         }
         else
         {
-            arinc_legs = leg_ptr;
+            arinc_legs_ = leg_ptr;
         }
         
-        n_arinc_legs_used = 0;
+        n_arinc_legs_used_ = 0;
 
-        if(arinc_legs == nullptr)
+        if(arinc_legs_ == nullptr)
         {
-            err_code = DbErr::BAD_ALLOC;
+            err_code_ = DbErr::BAD_ALLOC;
         }
         else
         {
-            err_code = load_db(arpt_db, navaid_db, cifp_path, postfix);
+            err_code_ = load_db(arpt_db, navaid_db, cifp_path, postfix);
         }
     }
 
-    Airport::Airport(const Airport& copy, arinc_leg_t* leg_ptr): appch_prefix_db(), rwy_db(), 
-        sid_db(), star_db(), appch_db(), sid_per_rwy(), star_per_rwy()
+    Airport::Airport(const Airport& copy, arinc_leg_t* leg_ptr): appch_prefix_db_(), rwy_db_(), 
+        sid_db_(), star_db_(), appch_db_(), sid_per_rwy_(), star_per_rwy_()
     {
-        assert(flt_leg_strings.size() == 0); // Make sure the other airport isn't being updated
+        assert(flt_leg_strings_.size() == 0); // Make sure the other airport isn't being updated
         
-        err_code = copy.err_code;
-        icao_code = copy.icao_code;
+        err_code_ = copy.err_code_;
+        icao_code_ = copy.icao_code_;
 
-        apt_data = copy.apt_data;
+        apt_data_ = copy.apt_data_;
 
-        use_appch_prefix = copy.use_appch_prefix;
-        appch_prefix_db = copy.appch_prefix_db;
-        rwy_db = copy.rwy_db;
-        n_arinc_legs_used = copy.n_arinc_legs_used;
+        use_appch_prefix_ = copy.use_appch_prefix_;
+        appch_prefix_db_ = copy.appch_prefix_db_;
+        rwy_db_ = copy.rwy_db_;
+        n_arinc_legs_used_ = copy.n_arinc_legs_used_;
 
-        self_alloc = false;
+        self_alloc_ = false;
         if(leg_ptr == nullptr)
         {
-            arinc_legs = new arinc_leg_t[N_FLT_LEG_CACHE_SZ];
-            self_alloc = true;
+            arinc_legs_ = new arinc_leg_t[N_FLT_LEG_CACHE_SZ];
+            self_alloc_ = true;
         }
         else
         {
-            arinc_legs = leg_ptr;
+            arinc_legs_ = leg_ptr;
         }
 
-        for(int i = 0; i < n_arinc_legs_used; i++)
+        for(int i = 0; i < n_arinc_legs_used_; i++)
         {
-            arinc_legs[i] = copy.arinc_legs[i];
+            arinc_legs_[i] = copy.arinc_legs_[i];
         }
 
-        sid_db = copy.sid_db;
-        star_db = copy.star_db;
-        appch_db = copy.appch_db;
+        sid_db_ = copy.sid_db_;
+        star_db_ = copy.star_db_;
+        appch_db_ = copy.appch_db_;
 
-        sid_per_rwy = copy.sid_per_rwy;
-        star_per_rwy = copy.star_per_rwy;
+        sid_per_rwy_ = copy.sid_per_rwy_;
+        star_per_rwy_ = copy.star_per_rwy_;
     }
 
     std::string Airport::get_icao() const noexcept {
-        return icao_code;
+        return icao_code_;
+    }
+
+    airport_data_t Airport::get_location_data() const noexcept {
+        return apt_data_;
     }
 
     DbErr Airport::get_err() const noexcept {
-        return err_code;
+        return err_code_;
     }
 
     std::vector<std::string> Airport::get_rwys() const noexcept
     {
         std::vector<std::string> out;
-        for(auto i: rwy_db)
+        for(auto i: rwy_db_)
         {
             out.push_back(i.first);
         }
@@ -714,82 +718,82 @@ namespace libnav
 
     const arinc_rwy_db_t& Airport::get_rwy_db() const noexcept
     {
-        return rwy_db;
+        return rwy_db_;
     }
 
     str_umap_t Airport::get_all_sids() const noexcept
     {
-        return get_all_proc(sid_db);
+        return get_all_proc(sid_db_);
     }
 
     str_umap_t Airport::get_all_stars() const noexcept
     {
-        return get_all_proc(star_db);
+        return get_all_proc(star_db_);
     }
 
     str_umap_t Airport::get_all_appch() const noexcept
     {
-        return get_all_proc(appch_db);
+        return get_all_proc(appch_db_);
     }
 
     arinc_leg_seq_t Airport::get_sid(const std::string& proc_name, 
         const std::string& trans) const noexcept
     {
-        return get_proc(proc_name, trans, sid_db);
+        return get_proc(proc_name, trans, sid_db_);
     }
 
     arinc_leg_seq_t Airport::get_star(const std::string& proc_name, 
         const std::string& trans) const noexcept
     {
-        return get_proc(proc_name, trans, star_db);
+        return get_proc(proc_name, trans, star_db_);
     }
 
     arinc_leg_seq_t Airport::get_appch(const std::string& proc_name, 
         const std::string& trans) const noexcept
     {
-        return get_proc(proc_name, trans, appch_db);
+        return get_proc(proc_name, trans, appch_db_);
     }
 
     str_set_t Airport::get_sid_by_rwy(const std::string& rwy_id) const noexcept
     {
-        return get_proc_by_rwy(rwy_id, sid_per_rwy);
+        return get_proc_by_rwy(rwy_id, sid_per_rwy_);
     }
 
     str_set_t Airport::get_star_by_rwy(const std::string& rwy_id) const noexcept
     {
-        return get_proc_by_rwy(rwy_id, star_per_rwy);
+        return get_proc_by_rwy(rwy_id, star_per_rwy_);
     }
 
     str_set_t Airport::get_rwy_by_sid(const std::string& sid) const noexcept
     {
-        return get_trans_by_proc(sid, sid_db, true);
+        return get_trans_by_proc(sid, sid_db_, true);
     }
 
     str_set_t Airport::get_rwy_by_star(const std::string& star) const noexcept
     {
-        return get_trans_by_proc(star, star_db, true);
+        return get_trans_by_proc(star, star_db_, true);
     }
 
     str_set_t Airport::get_trans_by_sid(const std::string& sid) const noexcept
     {
-        return get_trans_by_proc(sid, sid_db);
+        return get_trans_by_proc(sid, sid_db_);
     }
 
     str_set_t Airport::get_trans_by_star(const std::string& star) const noexcept
     {
-        return get_trans_by_proc(star, star_db);
+        return get_trans_by_proc(star, star_db_);
     }
 
     str_set_t Airport::get_trans_by_appch(const std::string& appch) const noexcept
     {
-        return get_trans_by_proc(appch, appch_db);
+        return get_trans_by_proc(appch, appch_db_);
     }
 
     Airport::~Airport()
     {
-        if(arinc_legs != nullptr && self_alloc)
+        if(arinc_legs_ != nullptr && self_alloc_)
         {
-            delete[] arinc_legs;
+            delete[] arinc_legs_;
         }
     }
 
@@ -823,7 +827,7 @@ namespace libnav
                 for(size_t i = 0; i < trans_it->second.size(); i++)
                 {
                     int leg_idx = trans_it->second[i];
-                    proc_legs.push_back(arinc_legs[leg_idx]);
+                    proc_legs.push_back(arinc_legs_[leg_idx]);
                 }
 
                 return proc_legs;
@@ -855,11 +859,11 @@ namespace libnav
         {
             for(auto i: proc_name_iter->second)
             {
-                if(rwy_db.find(i.first) != rwy_db.end() && rwy)
+                if(rwy_db_.find(i.first) != rwy_db_.end() && rwy)
                 {
                     out.insert(i.first);
                 }
-                else if(rwy_db.find(i.first) == rwy_db.end() && !rwy)
+                else if(rwy_db_.find(i.first) == rwy_db_.end() && !rwy)
                 {
                     out.insert(i.first);
                 }
@@ -872,10 +876,10 @@ namespace libnav
     DbErr Airport::parse_flt_legs(ArptDB* arpt_db, NavaidDB* navaid_db)
     {
         DbErr out = DbErr::SUCCESS;
-        while(flt_leg_strings.size())
+        while(flt_leg_strings_.size())
         {
-            proc_typed_str_t curr = flt_leg_strings.front();
-            flt_leg_strings.pop();
+            proc_typed_str_t curr = flt_leg_strings_.front();
+            flt_leg_strings_.pop();
 
             if(curr.second != ProcType::PRDAT)
             {
@@ -891,18 +895,18 @@ namespace libnav
                         trans_name = NONE_TRANS;
 
                     arinc_str_t arnc_str(s_split);
-                    arinc_leg_t leg = arnc_str.get_leg(icao_code, apt_data, arpt_db, 
-                        navaid_db, rwy_db);
+                    arinc_leg_t leg = arnc_str.get_leg(icao_code_, apt_data_, arpt_db, 
+                        navaid_db, rwy_db_);
 
-                    if(n_arinc_legs_used == N_FLT_LEG_CACHE_SZ)
+                    if(n_arinc_legs_used_ == N_FLT_LEG_CACHE_SZ)
                     {
                         return DbErr::BAD_ALLOC;
                     }
-                    arinc_legs[n_arinc_legs_used] = leg;
+                    arinc_legs_[n_arinc_legs_used_] = leg;
 
                     std::string rnw_trans = strutils::get_rnw_id(trans_name);
                     std::vector<std::string> rwys = get_all_rwys_by_mask(
-                        rnw_trans, rwy_db);
+                        rnw_trans, rwy_db_);
                     bool is_rwy = true;
 
                     if(rwys.size() == 0)
@@ -917,36 +921,36 @@ namespace libnav
                         {
                             if(is_rwy)
                             {
-                                sid_per_rwy[i].insert(proc_name);
+                                sid_per_rwy_[i].insert(proc_name);
                             }
-                            sid_db[proc_name][i].push_back(
-                                n_arinc_legs_used);
+                            sid_db_[proc_name][i].push_back(
+                                n_arinc_legs_used_);
                         }
                         else if(curr.second == ProcType::STAR)
                         {
                             if(is_rwy)
                             {
-                                star_per_rwy[i].insert(proc_name);
+                                star_per_rwy_[i].insert(proc_name);
                             }
-                            star_db[proc_name][i].push_back(
-                                n_arinc_legs_used);
+                            star_db_[proc_name][i].push_back(
+                                n_arinc_legs_used_);
                         }
                         else
                         {
                             std::string appr_nm = proc_name;
-                            if(use_appch_prefix)
+                            if(use_appch_prefix_)
                             {
-                                appr_nm = get_full_appr_nm(appr_nm, appch_prefix_db);
+                                appr_nm = get_full_appr_nm(appr_nm, appch_prefix_db_);
                             }
                             if(appr_nm != "")
                             {
-                                appch_db[appr_nm][i].push_back(
-                                    n_arinc_legs_used);
+                                appch_db_[appr_nm][i].push_back(
+                                    n_arinc_legs_used_);
                             }
                         }   
                     }
 
-                    n_arinc_legs_used++;
+                    n_arinc_legs_used_++;
                 }
                 else
                 {
@@ -962,7 +966,7 @@ namespace libnav
         NavaidDB* navaid_db, const std::string& path,
         const std::string& postfix)
     {
-        std::string full_path = path + "/" + icao_code + postfix;
+        std::string full_path = path + "/" + icao_code_ + postfix;
 
         std::ifstream file(full_path);
 		if (file.is_open())
@@ -976,17 +980,17 @@ namespace libnav
                 if(curr_tp != ProcType::RWY)
                 {
                     proc_typed_str_t tmp = std::make_pair(line, curr_tp);
-                    flt_leg_strings.push(tmp);
+                    flt_leg_strings_.push(tmp);
                 }
                 else
                 {
-                    arinc_rwy_full_t rwy(line, icao_code, arpt_db);
+                    arinc_rwy_full_t rwy(line, icao_code_, arpt_db);
 
                     if(rwy.err != DbErr::SUCCESS)
                     {
                         return DbErr::DATA_BASE_ERROR;
                     }
-                    rwy_db[rwy.id] = rwy.data;
+                    rwy_db_[rwy.id] = rwy.data;
                 }
             }
             file.close();
